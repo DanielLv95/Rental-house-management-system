@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>日志列表</title>
+    {load href="__CSS__/font.css,__CSS__/main.css,__JS__/jquery-1.9.0.min.js,__LIB__/layui/layui.js,__JS__/admin.js"/}
+</head>
+<body>
+<div class="body">
+    <table class="layui-hide layui-table" id="logtab" lay-filter="log"></table>
+</div>
+<script>
+    layui.use('table', function () {
+        var table = layui.table;
+
+        var tableIns = table.render({
+            elem: '#logtab'
+            , url: 'listlog'
+            , cols: [[
+                 {field: 'id', title: 'ID', width: 60, sort: true, fixed: true}
+                , {field: 'username', title: '用户名', width: 210}
+                , {field: 'time', title: '时间', width: 250, sort: true}
+                , {field: 'detail', title: '操作', width: 510}
+            ]]
+            , id: 'logList'
+            , page: true
+            , height: 500
+        });
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>房屋租赁管理系統</title>
+    {load href="__CSS__/font.css,__CSS__/main.css,__JS__/jquery-1.9.0.min.js,__LIB__/layui/layui.js,__JS__/admin.js"/}
+
+  </head>
+  
+  <body>
+    <div class="body">
+        <form class="layui-form">
+            <div class="layui-form-item" style="margin-left: 100px">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-inline" style="width:140px">
+                    <select name="states" id="states" lay-verify="staselect">
+                        <option value="">请选择状态</option>
+                        <option value="0">已预订</option>
+                        <option value="1">洽谈中</option>
+                        <option value="2">交易成功</option>
+                        <option value="3">交易失败</option>
+                    </select>
+                </div>
+            </div>
+            <input type="hidden" name="id" value="{$id}">
+            <input type="hidden" name="h_id" value="{$h_id}">
+          <div class="layui-form-item" style="margin-left: 200px">
+              <div class="layui-btn-group">
+                  <button  class="layui-btn" lay-filter="edit" lay-submit="">
+                      修改
+                  </button>
+              </div>
+          </div>
+      </form>
+    </div>
+    <script>
+
+        layui.use(['form','layer'], function(){
+//            $ = layui.jquery;
+          var form = layui.form
+          ,layer = layui.layer;
+
+          //表单验证规则
+          form.verify({
+              staselect: function() {
+                  var sta=$("#states").find("option:selected").text();
+                  if($('#states').val()==''){
+                      return '请选择';
+                  }
+                  if (sta=='{$sta}'){
+                      return '不要选择当前状态';
+                  }
+              }
+          });
+
+          //监听提交
+          form.on('submit(edit)', function(data){
+            $.ajax({
+                url:'/editstate',
+                data:JSON.stringify(data.field),
+                dataType:'JSON',
+                type:'post',
+                success:function (data) {
+                    if(data==1){
+                        open_layer('修改成功',6,0);
+                    }
+                    if(data==0){
+                        open_layer('修改失败',5,1);
+                    }
+                }
+            })
+            return false;
+          });
+
+        });
+        function open_layer(con,icon) {
+            layer.open({
+                title: '提示'
+                ,content: con
+                ,icon:icon
+                ,yes: function(index, layero){
+                    layer.close(index);
+                    var index = parent.layer.getFrameIndex(window.name);
+                    //关闭当前frame
+                    parent.layer.close(index);
+                    parent.location.reload();
+                }
+            })
+        }
+    </script>
+
+  </body>
+
+</html>

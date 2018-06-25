@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    {load
+    href="__CSS__/font.css,__JS__/jquery-1.9.0.min.js,__LIB__/layui/layui.js,__JS__/admin.js,__CSS__/main.css"/}
+    <style>
+        .laytable-cell-1-main_pic{  /*最后的pic为字段的field*/
+            height: 100px;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="body">
+    <div  class="layui-btn-group" style="width:100%">
+        <div style="margin-left: 100px">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-inline" style="width:140px">
+                <select name="states" id="states">
+                    <option value="">请选择状态</option>
+                    <option value="0">已预订</option>
+                    <option value="1">洽谈中</option>
+                    <option value="2">交易成功</option>
+                    <option value="3">交易失败</option>
+                </select>
+            </div>
+            <button class="layui-btn" data-type="reload"><i class="layui-icon">&#xe615;</i>搜索</button>
+            <button class="layui-btn" data-type="deleteData"><i class="layui-icon">&#xe640;</i>删除选中信息</button>
+            <button class="layui-btn" onclick="javascript:location.replace(location.href);"><i class="layui-icon">&#x1002;</i>刷新</button>
+        </div>
+        <hr>
+        <table class="layui-hide layui-table" id="dealtab" lay-filter="deal"></table>
+    </div>
+
+</div>
+
+<script type="text/html" id="showImg">
+    <div style="height: 400px"><img src="{{d.main_pic}}" ></div>
+</script>
+<script type="text/html" id="toolbar">
+    <a class="layui-btn  layui-btn-normal layui-btn-small" lay-event="edit">修改状态</a>
+    <a class="layui-btn layui-btn-danger layui-btn-small" lay-event="del">删除</a>
+</script>
+<script>
+    layui.use(['table','layer'], function () {
+        var table = layui.table
+            ,layer=layui.layer;
+
+        var tableIns=table.render({
+            elem: '#dealtab'
+            , url: 'dealdata'
+            , cols: [[
+                {checkbox: true}
+                , {field: 'id', title: 'ID', width: 60, sort: true}
+                , {field: 'h_id', title: '房屋ID', width: 100, sort: true}
+                ,{field: 'main_pic', title: '图片', width: 140, templet:'#showImg'}
+                , {field: 'title', title: '标题', width: 80}
+                , {field: 'rent', title: '租金', width: 110, sort: true}
+                , {field: 'zu', title: '出租者', width: 100}
+                , {field: 'qiu', title: '出租者', width: 100}
+                , {field: 'states', title: '状态',  sort: true,width: 150}
+                , { width: 200, align: '', toolbar: '#toolbar'}
+            ]]
+            , id: 'dealList'
+            , page: true
+            , height: 400
+        });
+//监听表格复选框选择
+        table.on('checkbox(deal)', function(obj){
+            console.log(obj)
+        });
+        //监听工具条
+        table.on('tool(deal)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+                del(data);
+            } else if(obj.event === 'edit'){
+                var id=data.id;
+                var h_id=data.h_id;
+                open_url('修改交易状态','dealedit/'+id+'/'+h_id,550,250);
+            }
+        });
+        var $ = layui.$, active = {
+            reload: function () {
+                var states = $('#states');
+                //执行重载
+                tableIns.reload({
+                    where: {
+                        states: states.val()
+                    }
+                });
+            }
+            ,deleteData: function(){
+                var checkStatus = table.checkStatus('dealList')
+                    ,data = checkStatus.data;
+
+                if(data.length<1){
+                    layer.msg('请选择要删除的交易信息');
+                }else {
+                    del(data);
+                }
+            }
+        };
+
+        $('.body .layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+    function del(data) {
+        layer.confirm('真的删除交易信息么', function(index){
+            $.ajax({
+                url:"deldeal",
+                data:JSON.stringify(data),
+                type:'POST',
+                dataType:'json',
+                success:function (data) {
+                    if(data==0){
+                        open_layer('删除失败',5);
+                    }else {
+                        open_layer('删除成功',6);
+                    }
+                }
+            });
+            layer.close(index);
+        });
+    }
+    function open_layer(con,icon) {
+        layer.open({
+            title: '提示'
+            ,content: con
+            ,icon:icon
+            ,yes: function(index, layero){
+                location.reload();
+                layer.close(index);
+            }
+            ,cancel: function(index, layero){
+                location.reload();
+                layer.close(index)
+                return false;
+            }
+        })
+    }
+</script>
+</body>
+</html>

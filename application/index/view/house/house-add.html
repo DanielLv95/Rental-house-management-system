@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>房屋租赁管理系統</title>
+    {load href="__CSS__/font.css,__CSS__/main.css,__JS__/jquery-1.9.0.min.js,__LIB__/layui/layui.js,__JS__/admin.js"/}
+
+  </head>
+  
+  <body>
+    <div class="body">
+        <form class="layui-form">
+          <div class="layui-form-item">
+              <label class="layui-form-label">
+                  <span class="red">*</span>标题
+              </label>
+              <div class="layui-input-inline"style="width: 40%">
+                  <input type="text" id="title" name="title" required="" lay-verify="title"
+                  autocomplete="off" class="layui-input">
+              </div>
+          </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="red">*</span>地址
+                </label>
+                <div class="layui-input-inline" style="width: 40%">
+                    <input type="text" id="address" name="address" required="" lay-verify="address"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="red">*</span>租金
+                </label>
+                <div class="layui-input-inline"style="width: 40%">
+                    <input type="text" id="rent" name="rent" required="" lay-verify="rent"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="red">*</span>主图
+                </label>
+                <div class="layui-input-inline">
+                    <ul>
+                        <li><img class="layui-upload-img" id="demo1" style="width: 300px;height: 200px;margin-bottom: 10px"></li>
+                        <li><button type="button" class="layui-btn" id="upload">上传图片</button></li>
+                    </ul>
+                </div>
+            </div>
+            <input type="hidden" name="mainpic" id="mainpic" lay-verify="mainpic">
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="red">*</span>详情
+                </label>
+                <div class="layui-input-block" style="width: 60%">
+                    <textarea id="detail" name="detail" style="display: none;" required="" lay-verify="detail"></textarea>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="red">*</span>房东
+                </label>
+                <div class="layui-input-inline"style="width: 40%">
+                    <select name="fangdong" id="cusselect" lay-verify="cusselect" lay-search>
+                        <option value="">直接选择或搜索选择</option>
+                    </select>
+                </div>
+            </div>
+          <div class="layui-form-item" style="margin-left: 100px">
+              <div class="layui-btn-group">
+                  <button  class="layui-btn" lay-filter="add" lay-submit="">
+                      增加
+                  </button>
+                  <button class="layui-btn" type="reset">重置</button>
+              </div>
+          </div>
+      </form>
+    </div>
+    <script>
+
+        loadSelect();
+        layui.use(['form','layer','layedit','upload'], function(){
+            $ = layui.jquery;
+          var form = layui.form
+          ,layer = layui.layer
+          ,layedit=layui.layedit
+              ,upload=layui.upload;
+            layedit.set({
+                uploadImage: {
+                    url: 'upload' //接口url
+                    ,type: 'post' //默认post
+                }
+            });
+          var index=layedit.build('detail');
+
+            upload.render({
+                elem: '#upload'
+                ,bindAction:'#add'
+                ,url: 'upload'
+                ,before: function(obj){
+                    obj.preview(function(index, file, result){
+                        $('#demo1').attr('src', result); //图片链接（base64）
+                    });
+                }
+                ,done: function(res){
+                    $('#mainpic').attr('value',res.data.src);
+//                    layui.form.render();
+                }
+            });
+          //表单验证规则
+          form.verify({
+              title:function (value) {
+                  if(!/^[\u4E00-\u9FA5A-Za-z0-9]+$/.test(value)){
+                      return '标题只能包括英文、数字、汉字、下划线';
+                  }
+                  if($('#title').val().length>50){
+                      return '标题长度不得超过50';
+                  }
+              }
+              , address:function (value) {
+                  if(!/^[\u4E00-\u9FA5A-Za-z0-9]+$/.test(value)){
+                      return '地址只能包括英文、数字、汉字、下划线';
+                  }
+                  if($('#address').val().length>100){
+                      return '地址长度不得超过100';
+                  }
+              }
+              ,rent:[/^[1-9][0-9]{2,4}$/,'请输入100-99999间的整数']
+              ,detail: function(value) {
+                  layedit.sync(index);
+                  if(value.length<50){
+                      return '多少写点东西吧！';
+                  }
+              }
+              ,mainpic:function (value) {
+                  if(value==''){
+                      return '图片还没上传呢,别急啊';
+                  }
+              }
+              ,cusselect:function () {
+                  if($('#cusselect').val()==''){
+                      return '请选择房东'
+                  }
+              }
+          });
+
+          //监听提交
+          form.on('submit(add)', function(data){
+              layedit.sync(index)
+              var detail=layedit.getContent(index);
+            $.ajax({
+                url:'addhouse',
+                data:JSON.stringify(data.field),
+                dataType:'JSON',
+                type:'post',
+                success:function (data) {
+                    if(data==1){
+                        open_layer('添加成功',6,0);
+                    }
+                    if(data==0){
+                        open_layer('添加失败',5,1);
+                    }
+                }
+            })
+            return false;
+          });
+
+        });
+        function open_layer(con,icon) {
+            layer.open({
+                title: '提示'
+                ,content: con
+                ,icon:icon
+                ,yes: function(index, layero){
+                    layer.close(index);
+                    location.reload();
+                    $('#title').focus();
+                }
+            })
+        }
+        function loadSelect() {
+            $.ajax({
+                url:"cusselect/1",
+                type: "GET",
+                dataType:'json',
+                success:function (data) {
+                    var root=document.getElementById("cusselect");
+                    for (var i=0;i<data.length;i++){
+                        var option=document.createElement("option");
+                        option.setAttribute("value",data[i].id);
+                        option.innerText=data[i].truename;
+                        root.appendChild(option);
+                        layui.form.render('select');
+                    }
+                }
+
+            });
+        }
+    </script>
+
+  </body>
+
+</html>

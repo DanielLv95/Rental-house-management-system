@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>房屋租赁管理系統</title>
+    {load href="__CSS__/font.css,__CSS__/main.css,__JS__/jquery-1.9.0.min.js,__LIB__/layui/layui.js,__JS__/admin.js"/}
+
+  </head>
+  
+  <body>
+    <div class="body">
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">权限</label>
+                <div class="layui-input-inline">
+                    <select name="role" lay-filter="role" lay-verify="role">
+                        <option value="" selected="">请选择</option>
+                        <option value="1">管理员</option>
+                        <option value="2">普通用户</option>
+                    </select>
+                </div>
+            </div>
+          <div class="layui-form-item">
+              <label class="layui-form-label">
+                  <span class="red">*</span>用户名
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="username" name="username" required="" lay-verify="username"
+                  autocomplete="off" class="layui-input">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label class="layui-form-label">
+                  <span class="red">*</span>密码
+              </label>
+              <div class="layui-input-inline">
+                  <input type="password" id="pass" name="pass" required="" lay-verify="pass"
+                  autocomplete="off" class="layui-input">
+              </div>
+              <div class="layui-form-mid layui-word-aux">
+                  字母开头，6~18字符，只包含字母、数字和下划线
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label class="layui-form-label">
+                  <span class="red">*</span>确认密码
+              </label>
+              <div class="layui-input-inline">
+                  <input type="password" id="repass" name="repass" required="" lay-verify="repass"
+                  autocomplete="off" class="layui-input">
+              </div>
+          </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="red">*</span>姓名
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="name" name="name" required="" lay-verify="name"
+                           autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    <span class="red">*</span>2-4个汉字
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="red">*</span>性别
+                </label>
+                <input type="radio" name="sex" value="1" title="男" checked>
+                <input type="radio" name="sex" value="2" title="女">
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="red">*</span>身份证号
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="idno" name="idno" required="" lay-verify="idno"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="red">*</span>地址
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="address" name="address" required="" lay-verify="address"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="red">*</span>手机号
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="phone" name="phone" required="" lay-verify="phone"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="red">*</span>邮箱
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="email" name="email" required="" lay-verify="email"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+          <div class="layui-form-item" style="margin-left: 100px">
+              <div class="layui-btn-group">
+                  <button  class="layui-btn" lay-filter="add" lay-submit="">
+                      增加
+                  </button>
+                  <button class="layui-btn" type="reset">重置</button>
+              </div>
+
+          </div>
+      </form>
+    </div>
+    <script>
+        layui.use(['form','layer','laydate'], function(){
+            $ = layui.jquery;
+          var form = layui.form
+          ,layer = layui.layer;
+
+          //表单验证规则
+          form.verify({
+              role:function (value) {
+                  if(value.length==0){
+                      return '权限未选';
+                  }
+              }
+            ,username:[/^[a-zA-Z][a-zA-Z0-9_]{4,15}$/,'用户名以字母开头，只能包含数字字母下划线，5—16位']
+            ,pass: [/^[a-zA-Z0-9_]{6,17}$/, '密码长度在6~18之间，只能包含字母、数字和下划线']
+            ,repass: function(value){
+                if($('#pass').val()!=$('#repass').val()){
+                    return '两次密码不一致';
+                }
+            }
+            ,name:[/^[\u4e00-\u9fa5]{2,4}$/,'姓名2-4个汉字']
+              ,idno:[/^(\d{6})(\d{4})(\d{2})(\d{2})(\d{3})([0-9]|X)$/,'请输入正确的身份证号码']
+              ,address:function (value) {
+                  if(!/^[\u4E00-\u9FA5A-Za-z0-9]+$/.test(value)){
+                      return '地址只能包括英文、数字、汉字、下划线';
+                  }
+                  if($('#address').val().length>100){
+                      return '地址长度不得超过100';
+                  }
+              }
+              ,phone:[/(^13|14|15|17|18|19)[0-9]{9}$/,'请输入正确的手机号码']
+              ,email:function (value) {
+
+                  if(!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(value)){
+                      return '请输入正确的邮箱地址';
+                  }
+                  if($('#email').val().length>50){
+                      return '地址长度不得超过100';
+                  }
+              }
+          });
+
+          //监听提交
+          form.on('submit(add)', function(data){
+            $.ajax({
+                url:'adduser',
+                data:JSON.stringify(data.field),
+                dataType:'JSON',
+                type:'post',
+                success:function (data) {
+                    if(data==0){
+                        open_layer('增加成功',6,0);
+                    }
+                    if(data==1){
+                        open_layer('增加失败',5,1);
+                    }
+                    if(data==2){
+                        open_layer('用户名已存在',5,2);
+                    }if(data==3){
+                        open_layer('身份证号已存在',5,3);
+                    }
+                    }
+            })
+            return false;
+          });
+
+        });
+        function open_layer(con,icon,act) {
+            layer.open({
+                title: '提示'
+                ,content: con
+                ,icon:icon
+                ,yes: function(index, layero){
+                    if(act==0){
+                        var index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+                        parent.location.reload();
+                    }
+                    if(act==2||act==1){
+                        $('#username').focus();
+                    }
+                    if(act==3){
+                        $('#idno').focus();
+                    }
+                    layer.close(index);
+                }
+            })
+        }
+    </script>
+
+  </body>
+
+</html>

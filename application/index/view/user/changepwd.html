@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>房屋租赁管理系統</title>
+    {load href="__CSS__/font.css,__CSS__/main.css,__JS__/jquery-1.9.0.min.js,__LIB__/layui/layui.js,__JS__/admin.js"/}
+
+  </head>
+  
+  <body>
+    <div class="body">
+        <form class="layui-form">
+          <div class="layui-form-item">
+              <label class="layui-form-label">
+                  <span class="red">*</span>用户名
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="username" name="username" required="" lay-verify="username"
+                  autocomplete="off" class="layui-input" value="{$Think.session.username}" readonly>
+              </div>
+          </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="red">*</span>原密码
+                </label>
+                <div class="layui-input-inline">
+                    <input type="password" id="opass" name="opass" required="" lay-verify="opass"
+                           autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    字母开头，6~18字符，只包含字母、数字和下划线
+                </div>
+            </div>
+          <div class="layui-form-item">
+              <label class="layui-form-label">
+                  <span class="red">*</span>新密码
+              </label>
+              <div class="layui-input-inline">
+                  <input type="password" id="npass" name="npass" required="" lay-verify="npass"
+                  autocomplete="off" class="layui-input">
+              </div>
+              <div class="layui-form-mid layui-word-aux">
+                  字母开头，6~18字符，只包含字母、数字和下划线
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label class="layui-form-label">
+                  <span class="red">*</span>确认密码
+              </label>
+              <div class="layui-input-inline">
+                  <input type="password" id="repass" name="repass" required="" lay-verify="repass"
+                  autocomplete="off" class="layui-input">
+              </div>
+          </div>
+          <div class="layui-form-item" style="margin-left: 180px">
+              <div class="layui-btn-group">
+                  <button  class="layui-btn" lay-filter="edit" lay-submit="">
+                      修改
+                  </button>
+              </div>
+
+          </div>
+      </form>
+    </div>
+    <script>
+
+        layui.use(['form','layer','laydate'], function(){
+            $ = layui.jquery;
+          var form = layui.form
+          ,layer = layui.layer;
+
+          //表单验证规则
+          form.verify({
+              opass: [/^[a-zA-Z][a-zA-Z0-9_]{5,17}$/, '字母开头，6~18字符，只包含字母、数字和下划线']
+              ,npass: [/^[a-zA-Z][a-zA-Z0-9_]{5,17}$/, '字母开头，6~18字符，只包含字母、数字和下划线']
+            ,repass: function(value){
+                if($('#npass').val()!=$('#repass').val()){
+                    return '两次密码不一致';
+                }
+            }
+          });
+
+          //监听提交
+          form.on('submit(edit)', function(data){
+            $.ajax({
+                url:'/changepwd/2',
+                data:JSON.stringify(data.field),
+                dataType:'JSON',
+                type:'post',
+                success:function (data) {
+                    if(data==0){
+                        open_layer('修改成功,请重新登录',6,0);
+                    }
+                    if(data==1){
+                        open_layer('修改失败',5,1);
+                    }
+                    if(data==2){
+                        open_layer('原密码错误',5,2);
+                    }
+                }
+            })
+            return false;
+          });
+
+        });
+        function open_layer(con,icon,act) {
+            layer.open({
+                title: '提示'
+                ,content: con
+                ,icon:icon
+                ,yes: function(index, layero){
+                    if(act==0){
+                        var index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+                        parent.location.href="/logout";
+
+                    }
+                    if(act==2||act==1){
+                        $('#opass').focus();
+                    }
+                    layer.close(index);
+                }
+            })
+        }
+    </script>
+
+  </body>
+
+</html>

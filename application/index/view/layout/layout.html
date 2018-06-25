@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>房屋租赁管理系统</title>
+    {load href="__CSS__/font.css,__CSS__/main.css,__JS__/jquery.min.js,__LIB__/layui/layui.js,__JS__/admin.js" /}
+
+</head>
+<body>
+<!-- 顶部开始 -->
+<div class="container">
+    <div class="logo"><a href="">房屋租赁管理系统</a></div>
+    <div class="left_open">
+        <i title="展开左侧栏" class="iconfont">&#xe699;</i>
+    </div>
+    <ul class="layui-nav right" lay-filter="">
+        <li class="layui-nav-item">
+            <a href="javascript:;">{$Think.session.username}</a>
+            <dl class="layui-nav-child"> <!-- 二级菜单 -->
+                <dd><a onclick="open_url('个人信息','memdetail/{$Think.session.id}',400,500)">个人信息</a></dd>
+                <dd><a onclick="open_url('修改密码','changepwd/1',400,500)">修改密码</a></dd>
+                <dd><a href="logout">退出</a></dd>
+            </dl>
+        </li>
+    </ul>
+
+</div>
+<!-- 顶部结束 -->
+<!-- 中部开始 -->
+[__REPLACE__]
+<!-- 左侧菜单结束 -->
+<!-- 右侧主体开始 -->
+<div class="page-content">
+    <div class="layui-tab tab" lay-filter="xbs_tab" lay-allowclose="false">
+        <ul class="layui-tab-title">
+            <li>公告列表</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <iframe src='listnotice' frameborder="0" scrolling="yes" class="iframe"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+<!--<div class="page-content-bg"></div>-->
+<!-- 右侧主体结束 -->
+<!-- 中部结束 -->
+<!-- 底部开始 -->
+<div class="footer">
+    <div class="copyright">Copyright ©2018 lvweicheng v1.1 All Rights Reserved</div>
+</div>
+</body>
+</html>

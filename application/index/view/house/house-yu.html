@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>房屋租赁管理系統</title>
+    {load href="__CSS__/font.css,__CSS__/main.css,__JS__/jquery-1.9.0.min.js,__LIB__/layui/layui.js,__JS__/admin.js"/}
+
+  </head>
+  
+  <body>
+    <div class="body">
+        <form class="layui-form">
+            <input type="hidden" name="hid" value="{$id}">
+            <div class="layui-form-item">
+                <label class="layui-form-label" style="width: 100px">
+                    <span class="red">*</span>请选择租住用户
+                </label>
+                <div class="layui-input-inline"style="width: 40%">
+                    <select name="qiuzu" id="cusselect" lay-verify="cusselect" lay-search>
+                        <option value="">直接选择或搜索选择</option>
+                    </select>
+                </div>
+            </div>
+          <div class="layui-form-item" style="margin-left: 100px">
+              <div class="layui-btn-group">
+                  <button  class="layui-btn" lay-filter="yu" lay-submit="">
+                      预定
+                  </button>
+              </div>
+          </div>
+      </form>
+    </div>
+    <script>
+        loadSelect();
+        layui.use(['layer','form'], function(){
+            $ = layui.jquery;
+          var form = layui.form
+          ,layer = layui.layer;
+
+          //表单验证规则
+          form.verify({
+              cusselect: function() {
+                  if($('#cusselect').val()==''){
+                      return '请选择';
+                  }
+              }
+          });
+
+          //监听提交
+          form.on('submit(yu)', function(data){
+            $.ajax({
+                url:'/yuhouse',
+                data:JSON.stringify(data.field),
+                dataType:'JSON',
+                type:'post',
+                success:function (data) {
+                    if(data==0){
+                        open_layer('预定成功',6,0);
+                    }
+                    if(data==1){
+                        open_layer('预定失败',5,1);
+                    }
+                    if(data==2){
+                        open_layer('该房已被预订',5,1);
+                    }
+                }
+            })
+            return false;
+          });
+        });
+        function open_layer(con,icon) {
+            layer.open({
+                title: '提示'
+                ,content: con
+                ,icon:icon
+                ,yes: function(index, layero){
+                    layer.close(index);
+                    var index = parent.layer.getFrameIndex(window.name);
+                    //关闭当前frame
+                    parent.layer.close(index);
+                    parent.location.reload();
+
+                }
+            })
+        }
+        function loadSelect() {
+            $.ajax({
+                url:"/cusselect/2",
+                type: "GET",
+                dataType:'json',
+                success:function (data) {
+                    var root=document.getElementById("cusselect");
+                    for (var i=0;i<data.length;i++){
+                        var option=document.createElement("option");
+                        option.setAttribute("value",data[i].id);
+                        option.innerText=data[i].truename;
+                        root.appendChild(option);
+                        layui.form.render('select');
+                    }
+                }
+            });
+        }
+    </script>
+
+  </body>
+
+</html>
